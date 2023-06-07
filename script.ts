@@ -14,6 +14,7 @@ async function main() {
 
   // see all user
   const users = await prisma.user.findMany()
+  console.log("main_1.1")
   console.log(users)
 
   // create and post
@@ -35,7 +36,39 @@ async function main() {
       posts: true,
     },
   })
+  console.log("main_1.2")
   console.dir(usersWithPosts, { depth: null })
+}
+
+async function main_2() {
+  const find_ID = await prisma.user.findUnique({
+    where : {
+      id: 1
+    }
+  })
+  console.log("main_2.1")
+  console.log(find_ID)
+
+  const find_email = await prisma.user.findUnique({
+    where: {
+      email: 'Pete@prisma.io',
+    },
+  })
+  console.log("main_2.2")
+  console.log(find_email)
+}
+
+async function main_3(){
+  const user = await prisma.user.findUnique({
+    where : {
+      email : "Pete@prisma.io"
+    },
+    select: {
+      name : true
+    }
+  })
+  console.log("main_3")
+  console.log(user)
 }
 
 main()
@@ -47,3 +80,5 @@ main()
     await prisma.$disconnect()
     process.exit(1)
   })
+main_2()
+main_3()
