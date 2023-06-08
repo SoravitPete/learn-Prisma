@@ -12,13 +12,17 @@ userRoute.get('/test', (req: Request, res: Response) => {
 })
 
 userRoute.get('/', async (req: Request, res: Response) => {
-  const users = await prisma.user.findMany({
-		include: {
-			posts: true
-		}
-	})
-  console.log(users)
-  res.send(users)
+	try {
+		const users = await prisma.user.findMany({
+			include: {
+				posts: true
+			}
+		})
+		console.log(users)
+		res.send(users)
+	} catch (error) {
+		res.status(404).json({ massage: "error."})
+	}
 })
 
 userRoute.get('/:id', async (req: Request, res: Response) => {
@@ -100,39 +104,34 @@ userRoute.delete('/:id', async (req: Request, res: Response) => {
 })
 
 userRoute.post('/', async (req: Request, res: Response) => {
-  const schema = Joi.object({
-    name: Joi.string().max(30).required(),
-    email: Joi.string().email().required(),
-		title: Joi.string().max(500).required()
-  })
-  var test = schema.validate({ name: req.body.name, email: req.body.email, title: req.body.title })
-  if (!test.error) {
-    const user = await prisma.user.create({
-      data: {
-        name: req.body.name,
-        email: req.body.email,
-				posts: {
-					create: {
-						title: req.body.title
+	try {
+		const schema = Joi.object({
+			name: Joi.string().max(30).required(),
+			email: Joi.string().email().required(),
+			title: Joi.string().max(500).required()
+		})
+		var test = schema.validate({ name: req.body.name, email: req.body.email, title: req.body.title })
+		if (!test.error) {
+			const user = await prisma.user.create({
+				data: {
+					name: req.body.name,
+					email: req.body.email,
+					posts: {
+						create: {
+							title: req.body.title
+						}
 					}
-				}
-      },
-    })
-    console.log(user)
-    res.send(user)
-  }
-  else {
-    console.log("error na kub")
-    res.json({ massage: "error na kub" })
-  }
-
-  try {
-    await schema.validateAsync({
-      name: req.body.name, email: req.body.email
-    })
-  } catch (err) {
-    reportError({ massage: "error na kub" })
-  }
+				},
+			})
+			console.log(user)
+			res.send(user)
+		} else {
+			console.log("error na kub")
+			res.json({ massage: "error na kub" })
+		}
+	} catch (error) {
+		res.status(404).json({ massage: 'Cannot create this Post'})
+	}
 })
 
 export default userRoute
