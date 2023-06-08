@@ -12,9 +12,37 @@ userRoute.get('/test', (req: Request, res: Response) => {
 })
 
 userRoute.get('/', async (req: Request, res: Response) => {
-  const users = await prisma.user.findMany()
+  const users = await prisma.user.findMany({
+		include: {
+			posts: true
+		}
+	})
   console.log(users)
   res.send(users)
+})
+
+userRoute.get('/:id', async (req: Request, res: Response) => {
+  try {
+		const schema = Joi.object({
+			id: Joi.number().integer(),
+		})
+		var test = schema.validate({ id: req.params.id })
+		if (!test.error) {
+			const object = await prisma.user.findUnique({
+				where: {
+					id: parseInt(req.params.id)
+				},
+				include: {
+					posts: true
+				}
+			})
+			res.send(object)
+		} else {
+			res.status(404).json({ massgae: 'wrong format.'})
+		}
+	} catch (error){
+		res.status(404).json({ massage: "object following by this id is not valid."})
+	}
 })
 
 userRoute.put('/', async (req: Request, res: Response) => {
@@ -73,15 +101,21 @@ userRoute.delete('/:id', async (req: Request, res: Response) => {
 
 userRoute.post('/', async (req: Request, res: Response) => {
   const schema = Joi.object({
-    name: Joi.string().required(),
-    email: Joi.string().email().required()
+    name: Joi.string().max(30).required(),
+    email: Joi.string().email().required(),
+		title: Joi.string().max(500).required()
   })
-  var test = schema.validate({ name: req.body.name, email: req.body.email })
+  var test = schema.validate({ name: req.body.name, email: req.body.email, title: req.body.title })
   if (!test.error) {
     const user = await prisma.user.create({
       data: {
         name: req.body.name,
         email: req.body.email,
+				posts: {
+					create: {
+						title: req.body.title
+					}
+				}
       },
     })
     console.log(user)
@@ -99,19 +133,6 @@ userRoute.post('/', async (req: Request, res: Response) => {
   } catch (err) {
     reportError({ massage: "error na kub" })
   }
-})
-
-userRoute.get('/:id', async (req: Request, res: Response) => {
-  const find_ID = await prisma.user.findUnique({
-    where: {
-      id: parseInt(req.params.id)
-    },
-    include: {
-      posts: true
-    }
-  })
-  console.log(find_ID)
-  res.send(find_ID)
 })
 
 export default userRoute
