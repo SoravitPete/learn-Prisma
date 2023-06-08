@@ -1,14 +1,13 @@
 import { PrismaClient } from '@prisma/client'
 import express, { NextFunction, Request, Response } from 'express'
-import * as Joi from "joi";
+import * as Joi from 'joi'
 
 const prisma = new PrismaClient()
 
 const userRoute = express.Router()
 
 userRoute.get('/test', (req: Request, res: Response) => {
-  console.log('Test1')
-  res.send("Test1")
+  res.send('Test1')
 })
 
 userRoute.get('/', async (req: Request, res: Response) => {
@@ -18,10 +17,9 @@ userRoute.get('/', async (req: Request, res: Response) => {
 				posts: true
 			}
 		})
-		console.log(users)
 		res.send(users)
 	} catch (error) {
-		res.status(404).json({ massage: "error."})
+		res.status(404).json({ massage: 'error.'})
 	}
 })
 
@@ -45,7 +43,7 @@ userRoute.get('/:id', async (req: Request, res: Response) => {
 			res.status(404).json({ massgae: 'wrong format.'})
 		}
 	} catch (error){
-		res.status(404).json({ massage: "object following by this id is not valid."})
+		res.status(404).json({ massage: 'object following by this id is not valid.'})
 	}
 })
 
@@ -68,13 +66,11 @@ userRoute.put('/', async (req: Request, res: Response) => {
 						name: data_name
 					}
 				})
-				console.log(updateUser)
 				res.send(updateUser)
 			} catch (err) {
         throw new Error('invalid email')
 			}
 		} else {
-			console.log("email or user name is wrong format")
 			res.send('email or user name is wrong format')
 		}
   } catch (error) {
@@ -123,11 +119,9 @@ userRoute.post('/', async (req: Request, res: Response) => {
 					}
 				},
 			})
-			console.log(user)
 			res.send(user)
 		} else {
-			console.log("error na kub")
-			res.json({ massage: "error na kub" })
+			res.json({ massage: 'error na kub' })
 		}
 	} catch (error) {
 		res.status(404).json({ massage: 'Cannot create this Post'})
