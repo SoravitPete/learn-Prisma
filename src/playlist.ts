@@ -17,11 +17,11 @@ playListRoute.get('/', (_: Request, res: Response) => {
   res.send('Hello World!')
 })
 
-playListRoute.get('/playlist', (req: Request, res: Response) => {
+playListRoute.get('/api', (req: Request, res: Response) => {
   res.send(playlist)
 })
 
-playListRoute.get('/playlist/:playlistID', (req: Request, res: Response)  => {
+playListRoute.get('/:playlistID', (req: Request, res: Response)  => {
   // req.quer.user
   // req.params.userId
   // req.body
@@ -93,7 +93,7 @@ playListRoute.get('/query_by_name', (req: Request, res: Response)  => {
   res.send(ans)
 })
 
-playListRoute.get('/query_by_id', (req: Request, res: Response)  => {
+playListRoute.get('/queryID', (req: Request, res: Response)  => {
   if (typeof req.query.id !== "string") {
     res.status(404).json({ message: 'Wrong Format'})
     return

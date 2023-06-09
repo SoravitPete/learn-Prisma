@@ -129,6 +129,7 @@ communityRoute.put('/change-date/:festival_id', (req: Request, res: Response) =>
         }
         num--;
     }
+    res.status(404).json({ massage : "Invalid festival id"})
 })
 
 communityRoute.get('/find/category', (req: Request, res: Response) =>{
