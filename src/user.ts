@@ -102,7 +102,7 @@ userRoute.delete('/:id', async (req: Request, res: Response) => { //delete user 
   }
 })
 
-userRoute.post('/', async (req: Request, res: Response) => { //create user gg
+userRoute.post('/', async (req: Request, res: Response) => { //create user.
   try {
     const schema = Joi.object({
       name: Joi.string().max(30).required(),
@@ -125,101 +125,34 @@ userRoute.post('/', async (req: Request, res: Response) => { //create user gg
   }
 })
 
-userRoute.put('/post/:user_id', async (req: Request, res: Response) => { //create post for specific user
-  try {
-    const data = req.params.user_id
-    const schema = Joi.object({
-      id: Joi.number().integer().required(),
-      title: Joi.string().max(500).required()
-    })
-    const test = schema.validate({ id: data, title: req.body.title })
-    if (!test.error) {
-      const create_post = await prisma.user.update({
-        where: {
-          id: parseInt(data)
-        },
-        data: {
-          posts: {
-            create: {
-              title: req.body.title
-            }
-          }
-        }
-      })
-      res.send(create_post)
-    } else {
-      res.status(404).json({ massage: "cannot create post by following user id" })
-    }
-  } catch (error) {
-    res.status(404).json({ massage: "Create post error" })
-  }
-})
-
-userRoute.delete('/post/:post_id', async (req: Request, res: Response) => { //delete post from specific id
-  try {
-    const post_id = req.params.post_id
-    const schema = Joi.object({
-      postID: Joi.number().integer().required(),
-    })
-    const test = schema.validate({ postID: post_id })
-    if (!test.error) {
-      const deletePost = await prisma.post.delete({
-        where: {
-          id: parseInt(post_id)
-        }
-      })
-      res.send(deletePost)
-    }
-  } catch (error) {
-    res.status(404).json({ massage: "GG na krub" })
-  }
-})
-
-userRoute.delete('/post/all/:author_id ', async (req: Request, res: Response) => { //delete all post from specific user
-  try {
-    const author_id = req.params.author_id
-    const schema = Joi.object({
-      authorID: Joi.number().integer().min(0).required(),
-    })
-    const test = schema.validate({ authorID: author_id })
-    if (!test.error) {
-      const deleteAllPost = await prisma.post.deleteMany({
-        where: {
-          authorId: parseInt(author_id)
-        }
-      })
-      res.send(deleteAllPost)
-    } else {
-      res.status(404).json({ massage: "wrong format of author_id" })
-    }
-  } catch (error) {
-    res.status(404).json({ massage: "cannot delete all Posts of specific author_id" })
-  }
-})
-
-userRoute.put('/post/:post_id/edit/', async (req: Request, res: Response) => { //edit title of post from specific post_id
-  try {
-    const post_id = req.params.post_id
-    const schema = Joi.object({
-      postID: Joi.number().integer().min(0).required(),
-    })
-    const test = schema.validate({ postID: post_id })
-    if (!test.error) {
-      const editTitle = await prisma.post.update({
-        where: {
-          id: parseInt(post_id)
-        },
-        data: {
-          title: req.body.title
-        }
-      })
-      res.send(editTitle)
-    } else {
-      res.status(404).json({ massage: "wrong format from post_id" })
-    }
-  } catch (error) {
-    res.status(404).json({ massage: "cannot edit post from specific post_id" })
-  }
-})
+// userRoute.put('/post/:user_id', async (req: Request, res: Response) => { //create post for specific user.
+//   try {
+//     const data = req.params.user_id
+//     const schema = Joi.object({
+//       id: Joi.number().integer().required(),
+//       title: Joi.string().max(500).required()
+//     })
+//     const test = schema.validate({ id: data, title: req.body.title })
+//     if (!test.error) {
+//       const create_post = await prisma.user.update({
+//         where: {
+//           id: parseInt(data)
+//         },
+//         data: {
+//           posts: {
+//             create: {
+//               title: req.body.title
+//             }
+//           }
+//         }
+//       })
+//       res.send(create_post)
+//     } else {
+//       res.status(404).json({ massage: "cannot create post by following user id" })
+//     }
+//   } catch (error) {
+//     res.status(404).json({ massage: "Create post error" })
+//   }
+// })
 
 export default userRoute
