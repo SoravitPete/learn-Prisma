@@ -102,7 +102,7 @@ userRoute.delete('/:id', async (req: Request, res: Response) => { //delete user 
   }
 })
 
-userRoute.post('/', async (req: Request, res: Response) => { //create user
+userRoute.post('/', async (req: Request, res: Response) => { //create user gg
   try {
     const schema = Joi.object({
       name: Joi.string().max(30).required(),
