@@ -18,8 +18,10 @@ userRoute.get('/', async (req: Request, res: Response) => { //get all user's inf
       }
     })
     res.send(users)
+    return
   } catch (error) {
     res.status(404).json({ massage: 'error.' })
+    return
   }
 })
 
@@ -39,13 +41,17 @@ userRoute.get('/:id', async (req: Request, res: Response) => { //get user infoma
         }
       })
       if (object == null) {
+        console.log("test_bug1")
         res.status(404).json({ massage: "couldnt find user by this id" })
+        return
       }
       res.send(object)
     } else {
+      console.log("test_bug2")
       res.status(404).json({ massgae: 'wrong format.' })
     }
   } catch (error) {
+    console.log("test_bug3")
     res.status(404).json({ massage: 'object following by this id is not valid.' })
   }
 })
@@ -69,12 +75,12 @@ userRoute.put('/', async (req: Request, res: Response) => { //change name of use
             name: data_name
           }
         })
-        res.send(updateUser)
+        res.json({ massage : updateUser})
       } catch (err) {
         throw new Error('invalid email')
       }
     } else {
-      res.send('email or user name is wrong format')
+      res.json({ massage: 'email or user name is wrong format'})
     }
   } catch (error) {
     res.status(404).json({ message: 'error', error })
@@ -87,17 +93,27 @@ userRoute.delete('/:id', async (req: Request, res: Response) => { //delete user 
       id: Joi.number().integer(),
     })
     var test = schema.validate({ id: req.params.id })
+    console.log("test init")
     if (!test.error) {
+      console.log("test gg")
+      const deleteAllPost = await prisma.post.deleteMany({
+        where: {
+            authorId: parseInt(req.params.id)
+        }
+      })
       const deleteUser = await prisma.user.delete({
         where: {
           id: parseInt(req.params.id),
         }
       })
-      res.send(deleteUser)
+      console.log("test_bug_state 1")
+      res.json({ userdata: deleteUser, postdata: deleteAllPost})
     } else {
+      console.log("test_bug_state 2")
       res.status(404).json({ massgae: 'wrong format.' })
     }
   } catch (err) {
+    console.log("test_bug_state 3")
     res.status(404).json({ massage: 'Cannot delete by this id' })
   }
 })
@@ -108,7 +124,7 @@ userRoute.post('/', async (req: Request, res: Response) => { //create user.
       name: Joi.string().max(30).required(),
       email: Joi.string().email().required(),
     })
-    var test = schema.validate({ name: req.body.name, email: req.body.email, title: req.body.title })
+    var test = schema.validate({ name: req.body.name, email: req.body.email })
     if (!test.error) {
       const user = await prisma.user.create({
         data: {
@@ -116,11 +132,15 @@ userRoute.post('/', async (req: Request, res: Response) => { //create user.
           email: req.body.email,
         },
       })
-      res.send(user)
+      console.log("test_bug_state 1")
+      res.json({data: user})
     } else {
+      console.log("test_bug_state 2")
       res.json({ massage: 'error na kub' })
     }
   } catch (error) {
+    console.log(error)
+    console.log("test_bug_state 3")
     res.status(404).json({ massage: 'Cannot create this Post' })
   }
 })

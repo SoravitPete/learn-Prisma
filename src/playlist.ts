@@ -21,6 +21,28 @@ playListRoute.get('/api', (req: Request, res: Response) => {
   res.send(playlist)
 })
 
+playListRoute.get('/query_by_name', (req: Request, res: Response)  => {
+  if (typeof req.query.type !== "string") {
+    res.status(404).json({ message: 'Wrong Format'})
+    return
+  }
+  var type = req.query.type;
+  var ans = playlist.find(item => item.type === type);
+  console.log(ans)
+  res.send(ans)
+})
+
+playListRoute.get('/queryID', (req: Request, res: Response)  => {
+  if (typeof req.query.id !== "string") {
+    res.status(404).json({ message: 'Wrong Format'})
+    return
+  }
+  var id = parseInt(req.query.id as string);
+  var ans = playlist.find(item => item.id === id);
+  console.log(ans)
+  res.send(ans)
+})
+
 playListRoute.get('/:playlistID', (req: Request, res: Response)  => {
   // req.quer.user
   // req.params.userId
@@ -80,28 +102,6 @@ playListRoute.put('/update/:playlistID', (req: Request, res: Response)  => {
   ans.type = new_data.type;
   console.log(typeof(ans));
   res.json({data : new_data});
-})
-
-playListRoute.get('/query_by_name', (req: Request, res: Response)  => {
-  if (typeof req.query.type !== "string") {
-    res.status(404).json({ message: 'Wrong Format'})
-    return
-  }
-  var type = req.query.type;
-  var ans = playlist.find(item => item.type === type);
-  console.log(ans)
-  res.send(ans)
-})
-
-playListRoute.get('/queryID', (req: Request, res: Response)  => {
-  if (typeof req.query.id !== "string") {
-    res.status(404).json({ message: 'Wrong Format'})
-    return
-  }
-  var id = parseInt(req.query.id as string);
-  var ans = playlist.find(item => item.id === id);
-  console.log(ans)
-  res.send(ans)
 })
 
 playListRoute.delete('/delete/:deleteID', (req: Request, res: Response)  => {
