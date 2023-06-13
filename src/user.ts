@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import express, { NextFunction, Request, Response } from 'express'
+import express, { Request, Response } from 'express'
 import * as Joi from 'joi'
 
 const prisma = new PrismaClient()
@@ -10,6 +10,30 @@ userRoute.get('/test', (req: Request, res: Response) => {
   res.send('Test1')
 })
 
+userRoute.post('/email', async (req: Request, res: Response) => { //get all user's information
+  try {
+    const email = req.body.email
+    const schema = Joi.object({
+      email: Joi.string().required(),
+    })
+    var test = schema.validate({ email: email })
+    if (!test.error) {
+      const users = await prisma.user.findMany({
+        where: {
+          email: email
+        },
+        include: {
+          posts: true
+        }
+      })
+      res.json({data: users})
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(404).json({ massage: 'error.', error })
+  }
+})
+
 userRoute.get('/', async (req: Request, res: Response) => { //get all user's information
   try {
     const users = await prisma.user.findMany({
@@ -17,11 +41,10 @@ userRoute.get('/', async (req: Request, res: Response) => { //get all user's inf
         posts: true
       }
     })
-    res.send(users)
-    return
+    res.json({data: users})
   } catch (error) {
-    res.status(404).json({ massage: 'error.' })
-    return
+    console.log(error)
+    res.status(404).json({ massage: 'error.', error })
   }
 })
 
@@ -45,14 +68,15 @@ userRoute.get('/:id', async (req: Request, res: Response) => { //get user infoma
         res.status(404).json({ massage: "couldnt find user by this id" })
         return
       }
-      res.send(object)
+      res.json({data: object})
     } else {
       console.log("test_bug2")
       res.status(404).json({ massgae: 'wrong format.' })
     }
   } catch (error) {
     console.log("test_bug3")
-    res.status(404).json({ massage: 'object following by this id is not valid.' })
+    console.log(error)
+    res.status(404).json({ massage: 'object following by this id is not valid.'})
   }
 })
 
@@ -75,7 +99,7 @@ userRoute.put('/', async (req: Request, res: Response) => { //change name of use
             name: data_name
           }
         })
-        res.json({ massage : updateUser})
+        res.json({ data : updateUser})
       } catch (err) {
         throw new Error('invalid email')
       }
@@ -83,7 +107,8 @@ userRoute.put('/', async (req: Request, res: Response) => { //change name of use
       res.json({ massage: 'email or user name is wrong format'})
     }
   } catch (error) {
-    res.status(404).json({ message: 'error', error })
+    console.log(error)
+    res.status(404).json({ message: 'cannot update username' })
   }
 })
 
@@ -112,9 +137,10 @@ userRoute.delete('/:id', async (req: Request, res: Response) => { //delete user 
       console.log("test_bug_state 2")
       res.status(404).json({ massgae: 'wrong format.' })
     }
-  } catch (err) {
+  } catch (error) {
     console.log("test_bug_state 3")
-    res.status(404).json({ massage: 'Cannot delete by this id' })
+    console.log(error)
+    res.status(404).json({ massage: 'Cannot delete by this id'})
   }
 })
 
@@ -139,13 +165,13 @@ userRoute.post('/', async (req: Request, res: Response) => { //create user.
       res.json({ massage: 'error na kub' })
     }
   } catch (error) {
-    console.log(error)
     console.log("test_bug_state 3")
-    res.status(404).json({ massage: 'Cannot create this Post' })
+    console.log(error)
+    res.status(404).json({ massage: 'Cannot create this Post'})
   }
 })
 
-// userRoute.put('/post/:user_id', async (req: Request, res: Response) => { //create post for specific user.
+// userRoute.put('/post/:user_id', async (req: Request, res: Response) => { //create user the create post autmatically.
 //   try {
 //     const data = req.params.user_id
 //     const schema = Joi.object({
